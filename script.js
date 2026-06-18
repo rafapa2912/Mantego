@@ -77,4 +77,45 @@
       setTimeout(() => { btn.textContent = original; btn.style.background = ''; btn.style.color = ''; }, 1600);
     });
   });
+
+  // ===== Calculadora "tempo gasto com manteiga" (só na calculadora.html) =====
+  const calcForm = document.getElementById('calc-form');
+  if (calcForm) {
+    // Premissas (segundos por vez). Trocar aqui se quiser ajustar.
+    const SEG_PASSAR_NORMAL = 60;   // 1 min passando com a faca
+    const SEG_LAVAR_FACA   = 30;    // 30 s lavando a faca
+    const SEG_PASSAR_MANTEGO = 10;  // 10 s com o MantêGo (sem faca)
+    const MESES = 12, ANOS = 80;
+
+    const input = document.getElementById('calc-input');
+    const result = document.getElementById('calc-result');
+    const fmt = n => Math.round(n).toLocaleString('pt-BR');
+    const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+
+    calcForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let n = parseInt(input.value, 10);
+      if (!n || n < 1) { input.focus(); return; }
+      n = Math.min(n, 200);
+
+      const usos = n * MESES * ANOS;                  // vezes ao longo da vida
+      const hPassar  = usos * SEG_PASSAR_NORMAL / 3600;
+      const hLavar   = usos * SEG_LAVAR_FACA   / 3600;
+      const hNormal  = hPassar + hLavar;
+      const hMantego = usos * SEG_PASSAR_MANTEGO / 3600;
+      const hEcon    = hNormal - hMantego;
+
+      set('r-passar', fmt(hPassar) + ' h');
+      set('r-lavar', fmt(hLavar) + ' h');
+      set('r-normal', fmt(hNormal));
+      set('r-mantego', fmt(hMantego));
+      set('r-normal-days', '≈ ' + fmt(hNormal / 24) + ' dias inteiros');
+      set('r-mantego-days', '≈ ' + fmt(hMantego / 24) + ' dias');
+      set('r-economia', fmt(hEcon) + ' horas');
+      set('r-economia-days', fmt(hEcon / 24));
+
+      result.classList.add('show');
+      requestAnimationFrame(() => result.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+    });
+  }
 })();
